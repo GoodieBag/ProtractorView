@@ -49,9 +49,9 @@ public class ProtractorView extends View {
     private int mThumbXPos;
     private int mThumbYPos;
 
-    private int mAngleTextSize = 8;
+    private int mAngleTextSize = 12;
 
-    private int mTickOffset = 10;
+    private int mTickOffset = 12;
     private int mTickLength = 10;
     private int mTickWidth = 2;
     private int mTickProgressWidth = 2;
@@ -257,7 +257,7 @@ public class ProtractorView extends View {
                 thetaInRadians = Math.toRadians(i);
                 slope = Math.tan(thetaInRadians);
                 startTickX = (radiusOffset * Math.cos(thetaInRadians));
-                midTickX = startTickX + (((mTickLength / 2) * DENSITY) * Math.cos(thetaInRadians));
+                midTickX = startTickX + (((mTickLength / 2)) * Math.cos(thetaInRadians));
                 midTickY = slope * midTickX;
                 canvas.drawText("" + (360 - i), (float) midTickX, (float) midTickY, (mAngle <= 359 - i) ? mTickTextPaint : mTickTextColoredPaint);
                 count = 0;
@@ -270,7 +270,7 @@ public class ProtractorView extends View {
                 slope = Math.tan(thetaInRadians);
                 startTickX = (radiusOffset * Math.cos(thetaInRadians));
                 startTickY = slope * startTickX;
-                endTickX = startTickX + ((mTickLength * DENSITY) * Math.cos(thetaInRadians));
+                endTickX = startTickX + ((mTickLength) * Math.cos(thetaInRadians));
                 endTickY = slope * endTickX;
                 canvas.drawLine((float) startTickX, (float) startTickY, (float) endTickX, (float) endTickY, (mAngle <= 359 - i) ? mTickPaint : mTickProgressPaint);
                 count++;
@@ -420,4 +420,60 @@ public class ProtractorView extends View {
         mOnProtractorViewChangeListener=null;
     }
 
+    public int getAngle() {
+        return mAngle;
+    }
+
+    public void setAngle(int angle) {
+        this.mAngle = angle;
+        onProgressRefresh((int) mAngle, false);
+    }
+
+    public boolean getTouchInside(){
+        return mTouchInside;
+    }
+
+    public boolean isEnabled() {
+        return mEnabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.mEnabled = enabled;
+    }
+
+    public int getProgressColor() {
+        return mProgressPaint.getColor();
+    }
+
+    public void setProgressColor(int color) {
+        mProgressPaint.setColor(color);
+        invalidate();
+    }
+
+    public int getArcColor() {
+        return mArcPaint.getColor();
+    }
+
+    public void setArcColor(int color) {
+        mArcPaint.setColor(color);
+        invalidate();
+    }
+
+    public int getProgressWidth() {
+        return mProgressWidth;
+    }
+
+    public void setProgressWidth(int mProgressWidth) {
+        this.mProgressWidth = mProgressWidth;
+        mProgressPaint.setStrokeWidth(mProgressWidth);
+    }
+
+    public int getArcWidth() {
+        return mArcWidth;
+    }
+
+    public void setArcWidth(int mArcWidth) {
+        this.mArcWidth = mArcWidth;
+        mArcPaint.setStrokeWidth(mArcWidth);
+    }
 }
