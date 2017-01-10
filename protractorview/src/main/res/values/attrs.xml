@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="ProtractorView">
+        <attr name="thumb" format="reference"/>
+        <attr name="thumbOffset" format="dimension"/>
+        <attr name="angleTextSize" format="dimension"/>
+        <attr name="progressWidth" format="dimension"/>
+        <attr name="tickOffset" format="dimension"/>
+        <attr name="tickLength" format="dimension"/>
+        <attr name="arcWidth" format="dimension"/>
+        <attr name="angle" format="integer"/>
+        <attr name="tickIntervals" format="integer"/>
+        <attr name="arcColor" format="color"/>
+        <attr name="arcProgressColor" format="color"/>
+        <attr name="textColor" format="color"/>
+        <attr name="textProgressColor" format="color"/>
+        <attr name="tickColor" format="color"/>
+        <attr name="tickProgressColor" format="color"/>
+        <attr name="roundEdges" format="boolean"/>
+        <attr name="touchInside" format="boolean"/>
+        <attr name="ticksBetweenLabel"/>
+    </declare-styleable>
+
+    <attr name="ticksBetweenLabel" format="enum">
+        <enum name="one" value="0"/>
+        <enum name="one" value="1"/>
+        <enum name="one" value="2"/>
+        <enum name="one" value="3"/>
+    </attr>
+
+    <declare-styleable name="ProtractorViewTheme">
+        <attr name="protractorViewStyle" format="reference" />
+    </declare-styleable>
+</resources>
