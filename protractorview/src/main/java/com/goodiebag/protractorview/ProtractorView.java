@@ -3,10 +3,12 @@ package com.goodiebag.protractorview;
 import android.content.Context;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
+import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
+import android.view.MotionEvent;
 import android.view.View;
 
 /**
@@ -63,6 +65,7 @@ public class ProtractorView extends View {
 
     //Event listener
     private OnProtractorViewChangeListener mOnProtractorViewChangeListener = null;
+
 
     //Interface for event listener
     public interface OnProtractorViewChangeListener {
@@ -193,4 +196,228 @@ public class ProtractorView extends View {
         mTickTextColoredPaint.setTextSize(mAngleTextSize);
         mTickTextColoredPaint.setTextAlign(Paint.Align.CENTER);
     }
+
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+
+        int height = getDefaultSize(getSuggestedMinimumHeight(),
+                heightMeasureSpec);
+        int width = getDefaultSize(getSuggestedMinimumWidth(),
+                widthMeasureSpec);
+        int min = Math.min(width, height);
+        //width = min;
+        height = min / 2;
+
+
+        float top = 0;
+        float left = 0;
+        int arcDiameter = 0;
+
+        int tickEndToArc = (mTickOffset + mTickLength);
+
+        arcDiameter = min - 2 * tickEndToArc;
+        arcDiameter = (int) (arcDiameter - 2 * 20 * DENSITY);
+        mArcRadius = arcDiameter / 2;
+
+
+        top = height - (mArcRadius);
+        left = width / 2 - mArcRadius;
+
+        mArcRect.set(left, top, left + arcDiameter, top + arcDiameter);
+
+        mTranslateX = (int) mArcRect.centerX();
+        mTranslateY = (int) mArcRect.centerY();
+
+
+        int thumbAngle = mAngle;
+        mThumbXPos = (int) (mArcRadius * Math.cos(Math.toRadians(thumbAngle)));
+        mThumbYPos = (int) (mArcRadius * Math.sin(Math.toRadians(thumbAngle)));
+        setTouchInSide(mTouchInside);
+        setMeasuredDimension(width, height + tickEndToArc);
+    }
+
+
+    @Override
+    protected void onDraw(Canvas canvas) {
+        canvas.save();
+        canvas.scale(1, -1, mArcRect.centerX(), mArcRect.centerY());
+        canvas.drawArc(mArcRect, 0, MAX, false, mArcPaint);
+        canvas.drawArc(mArcRect, 0, mAngle, false, mProgressPaint);
+
+        canvas.restore();
+        double slope, startTickX, startTickY, endTickX, endTickY, midTickX, midTickY, thetaInRadians;
+        double radiusOffset = mArcRadius + mTickOffset;
+
+        int count = mTicksBetweenLabel;
+        for (int i = 360; i >= 180; i -= mTickIntervals) {
+            canvas.save();
+            if (count == mTicksBetweenLabel) {
+                //for text
+                canvas.translate(mArcRect.centerX(), mArcRect.centerY());
+                thetaInRadians = Math.toRadians(i);
+                slope = Math.tan(thetaInRadians);
+                startTickX = (radiusOffset * Math.cos(thetaInRadians));
+                midTickX = startTickX + (((mTickLength / 2) * DENSITY) * Math.cos(thetaInRadians));
+                midTickY = slope * midTickX;
+                canvas.drawText("" + (360 - i), (float) midTickX, (float) midTickY, (mAngle <= 359 - i) ? mTickTextPaint : mTickTextColoredPaint);
+                count = 0;
+            } else {
+                //for tick
+                canvas.scale(-1, 1, mArcRect.centerX(), mArcRect.centerY());
+                canvas.translate(mArcRect.centerX(), mArcRect.centerY());
+                canvas.rotate(180);
+                thetaInRadians = Math.toRadians(360 - i);
+                slope = Math.tan(thetaInRadians);
+                startTickX = (radiusOffset * Math.cos(thetaInRadians));
+                startTickY = slope * startTickX;
+                endTickX = startTickX + ((mTickLength * DENSITY) * Math.cos(thetaInRadians));
+                endTickY = slope * endTickX;
+                canvas.drawLine((float) startTickX, (float) startTickY, (float) endTickX, (float) endTickY, (mAngle <= 359 - i) ? mTickPaint : mTickProgressPaint);
+                count++;
+            }
+            canvas.restore();
+        }
+
+
+        if (mEnabled) {
+            // Draw the thumb nail
+            canvas.save();
+            canvas.scale(-1, 1, mArcRect.centerX(), mArcRect.centerY());
+            canvas.translate(mTranslateX - mThumbXPos, mTranslateY - mThumbYPos);
+            mThumb.draw(canvas);
+            canvas.restore();
+        }
+    }
+
+
+    @Override
+    protected void drawableStateChanged() {
+        super.drawableStateChanged();
+        if (mThumb != null && mThumb.isStateful()) {
+            int[] state = getDrawableState();
+            mThumb.setState(state);
+        }
+        invalidate();
+    }
+
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        if (mEnabled) {
+            this.getParent().requestDisallowInterceptTouchEvent(true);
+
+            switch (event.getAction()) {
+                case MotionEvent.ACTION_DOWN:
+                    onStartTrackingTouch();
+                    updateOnTouch(event);
+                    break;
+                case MotionEvent.ACTION_MOVE:
+                    updateOnTouch(event);
+                    break;
+                case MotionEvent.ACTION_UP:
+                    onStopTrackingTouch();
+                    setPressed(false);
+                    this.getParent().requestDisallowInterceptTouchEvent(false);
+                    break;
+                case MotionEvent.ACTION_CANCEL:
+                    onStopTrackingTouch();
+                    setPressed(false);
+                    this.getParent().requestDisallowInterceptTouchEvent(false);
+                    break;
+            }
+            return true;
+        }
+        return false;
+    }
+
+    private void onStartTrackingTouch() {
+        if (mOnProtractorViewChangeListener != null) {
+            mOnProtractorViewChangeListener.onStartTrackingTouch(this);
+        }
+    }
+
+    private void onStopTrackingTouch() {
+        if (mOnProtractorViewChangeListener != null) {
+            mOnProtractorViewChangeListener.onStopTrackingTouch(this);
+        }
+    }
+
+
+    private boolean ignoreTouch(float xPos, float yPos) {
+        boolean ignore = false;
+        float x = xPos - mTranslateX;
+        float y = yPos - mTranslateY;
+
+        float touchRadius = (float) Math.sqrt(((x * x) + (y * y)));
+        if (touchRadius < mTouchIgnoreRadius) {
+            ignore = true;
+        }
+        return ignore;
+    }
+
+    private void updateOnTouch(MotionEvent event) {
+        boolean ignoreTouch = ignoreTouch(event.getX(), event.getY());
+        if (ignoreTouch) {
+            return;
+        }
+        setPressed(true);
+        mTouchAngle = getTouchDegrees(event.getX(), event.getY());
+        onProgressRefresh((int) mTouchAngle, true);
+    }
+
+
+
+    private double getTouchDegrees(float xPos, float yPos) {
+        float x = xPos - mTranslateX;
+        float y = yPos - mTranslateY;
+        x = -x;
+        // convert to arc Angle
+        double angle = Math.toDegrees(Math.atan2(y, x) + (Math.PI));
+        if (angle > 270)
+            angle = 0;
+        else if (angle > 180)
+            angle = 180;
+        return angle;
+    }
+
+    private void onProgressRefresh(int angle, boolean fromUser) {
+        updateAngle(angle, fromUser);
+    }
+
+    private void updateAngle(int angle, boolean fromUser) {
+        mAngle = (angle > MAX) ? MAX : (angle < 0) ? 0 : angle;
+
+        if (mOnProtractorViewChangeListener != null) {
+            mOnProtractorViewChangeListener.onProgressChanged(this, mAngle, fromUser);
+        }
+        updateThumbPosition();
+        invalidate();
+    }
+
+
+    private void updateThumbPosition() {
+        int thumbAngle = mAngle; //(int) (mStartAngle + mProgressSweep + mRotation + 90);
+        mThumbXPos = (int) (mArcRadius * Math.cos(Math.toRadians(thumbAngle)));
+        mThumbYPos = (int) (mArcRadius * Math.sin(Math.toRadians(thumbAngle)));
+    }
+
+    public void setTouchInSide(boolean isEnabled) {
+        int thumbHalfheight = (int) mThumb.getIntrinsicHeight() / 2;
+        int thumbHalfWidth = (int) mThumb.getIntrinsicWidth() / 2;
+        mTouchInside = isEnabled;
+        if (mTouchInside) {
+            mTouchIgnoreRadius = (float) (mArcRadius / 1.5);
+        } else {
+            mTouchIgnoreRadius = mArcRadius - Math.min(thumbHalfWidth, thumbHalfheight);
+        }
+    }
+
+    public void setOnProtractorViewChangeListener(OnProtractorViewChangeListener l) {
+        mOnProtractorViewChangeListener = l;
+    }
+
+    public void removeOnProtractorViewChangeListener(){
+        mOnProtractorViewChangeListener=null;
+    }
+
 }
