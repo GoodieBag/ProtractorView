@@ -22,10 +22,10 @@
     </declare-styleable>
 
     <attr name="ticksBetweenLabel" format="enum">
-        <enum name="one" value="0"/>
+        <enum name="zero" value="0"/>
         <enum name="one" value="1"/>
-        <enum name="one" value="2"/>
-        <enum name="one" value="3"/>
+        <enum name="two" value="2"/>
+        <enum name="three" value="3"/>
     </attr>
 
     <declare-styleable name="ProtractorViewTheme">
