@@ -2,6 +2,7 @@ package com.goodiebag.protractorview;
 
 import android.content.Context;
 import android.content.res.Resources;
+import android.content.res.TypedArray;
 import android.graphics.Paint;
 import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
@@ -46,15 +47,13 @@ public class ProtractorView extends View {
     private int mThumbXPos;
     private int mThumbYPos;
 
-
-
     private int mAngleTextSize = 8;
 
     private int mTickOffset = 10;
     private int mTickLength = 10;
     private int mTickWidth = 2;
     private int mTickProgressWidth = 2;
-    private int mProgress = 0;
+    private int mAngle = 0;
     private boolean mTouchInside = true;
     private boolean mEnabled = true;
     private int mTicksBetweenLabel = 2;
@@ -63,12 +62,14 @@ public class ProtractorView extends View {
     private float mTouchIgnoreRadius;
 
     //Event listener
-    private OnProtractorViewChangeListener mOnProtractorViewChangeListener =null;
+    private OnProtractorViewChangeListener mOnProtractorViewChangeListener = null;
 
     //Interface for event listener
     public interface OnProtractorViewChangeListener {
         void onProgressChanged(ProtractorView protractorView, int progress, boolean fromUser);
+
         void onStartTrackingTouch(ProtractorView protractorView);
+
         void onStopTrackingTouch(ProtractorView protractorView);
     }
 
@@ -90,7 +91,7 @@ public class ProtractorView extends View {
 
         // Defaults, may need to link this into theme settings
         int arcColor = res.getColor(R.color.progress_gray);
-        int progressColor = res.getColor(R.color.default_blue_light);
+        int arcProgressColor = res.getColor(R.color.default_blue_light);
         int textColor = res.getColor(R.color.progress_gray);
         int textProgressColor = res.getColor(R.color.default_blue_light);
         int tickColor = res.getColor(R.color.progress_gray);
@@ -101,7 +102,6 @@ public class ProtractorView extends View {
         mThumb = res.getDrawable(R.drawable.thumb_selector);
 
 
-
         // Convert all default dimens to pixels for current density
         mArcWidth = (int) (mArcWidth * DENSITY);
         mProgressWidth = (int) (mProgressWidth * DENSITY);
@@ -110,5 +110,39 @@ public class ProtractorView extends View {
         mTickLength = (int) (mTickLength * DENSITY);
         mTickWidth = (int) (mTickWidth * DENSITY);
         mTickProgressWidth = (int) (mTickProgressWidth * DENSITY);
+
+        if (attrs != null) {
+            final TypedArray array = context.obtainStyledAttributes(attrs, R.styleable.ProtractorView, defStyle, 0);
+            Drawable thumb = array.getDrawable(R.styleable.ProtractorView_thumb);
+            if (thumb != null) {
+                mThumb = thumb;
+            }
+            thumbHalfheight = mThumb.getIntrinsicHeight() / 2;
+            thumbHalfWidth = mThumb.getIntrinsicWidth() / 2;
+            mThumb.setBounds(-thumbHalfWidth, -thumbHalfheight, thumbHalfWidth, thumbHalfheight);
+            //Dimensions
+            mAngleTextSize = (int) array.getDimension(R.styleable.ProtractorView_angleTextSize, mAngleTextSize);
+            mProgressWidth = (int) array.getDimension(R.styleable.ProtractorView_progressWidth, mProgressWidth);
+            mTickOffset = (int) array.getDimension(R.styleable.ProtractorView_tickOffset, mTickOffset);
+            mTickLength = (int) array.getDimension(R.styleable.ProtractorView_tickLength, mTickLength);
+            mArcWidth = (int) array.getDimension(R.styleable.ProtractorView_arcWidth, mArcWidth);
+            //Integers
+            mAngle = array.getInteger(R.styleable.ProtractorView_angle, mAngle);
+            mTickIntervals = array.getInt(R.styleable.ProtractorView_tickIntervals, mTickIntervals);
+            //Colors
+            arcColor = array.getColor(R.styleable.ProtractorView_arcColor, arcColor);
+            arcProgressColor = array.getColor(R.styleable.ProtractorView_arcProgressColor, arcProgressColor);
+            textColor = array.getColor(R.styleable.ProtractorView_textColor, textColor);
+            textProgressColor = array.getColor(R.styleable.ProtractorView_textProgressColor, textProgressColor);
+            tickColor = array.getColor(R.styleable.ProtractorView_tickColor, tickColor);
+            tickProgressColor = array.getColor(R.styleable.ProtractorView_tickProgressColor, tickProgressColor);
+            //Boolean
+            mRoundedEdges = array.getBoolean(R.styleable.ProtractorView_roundEdges, mRoundedEdges);
+            mEnabled = array.getBoolean(R.styleable.ProtractorView_enabled, mEnabled);
+            mTouchInside = array.getBoolean(R.styleable.ProtractorView_touchInside, mTouchInside);
+            mTicksBetweenLabel = array.getInt(R.styleable.ProtractorView_ticksBetweenLabel, mTicksBetweenLabel);
+
+
+        }
     }
 }

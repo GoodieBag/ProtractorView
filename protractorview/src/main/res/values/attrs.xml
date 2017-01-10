@@ -2,7 +2,6 @@
 <resources>
     <declare-styleable name="ProtractorView">
         <attr name="thumb" format="reference"/>
-        <attr name="thumbOffset" format="dimension"/>
         <attr name="angleTextSize" format="dimension"/>
         <attr name="progressWidth" format="dimension"/>
         <attr name="tickOffset" format="dimension"/>
@@ -17,6 +16,7 @@
         <attr name="tickColor" format="color"/>
         <attr name="tickProgressColor" format="color"/>
         <attr name="roundEdges" format="boolean"/>
+        <attr name="enabled" format="boolean"/>
         <attr name="touchInside" format="boolean"/>
         <attr name="ticksBetweenLabel"/>
     </declare-styleable>
