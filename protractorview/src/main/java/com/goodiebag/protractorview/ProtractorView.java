@@ -98,7 +98,7 @@ public class ProtractorView extends View {
         int thumbHalfheight = 0;
         int thumbHalfWidth = 0;
 
-        mThumb = res.getDrawable(R.drawable.seek_arc_control_selector);
+        mThumb = res.getDrawable(R.drawable.thumb_selector);
 
 
 
