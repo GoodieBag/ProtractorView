@@ -75,14 +75,17 @@ public class ProtractorView extends View {
 
     public ProtractorView(Context context) {
         super(context);
+        init(context, null, 0);
     }
 
     public ProtractorView(Context context, AttributeSet attrs) {
         super(context, attrs);
+        init(context, attrs, R.attr.protractorViewStyle);
     }
 
     public ProtractorView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
+        init(context, attrs, defStyleAttr);
     }
 
     private void init(Context context, AttributeSet attrs, int defStyle) {
@@ -142,7 +145,52 @@ public class ProtractorView extends View {
             mTouchInside = array.getBoolean(R.styleable.ProtractorView_touchInside, mTouchInside);
             mTicksBetweenLabel = array.getInt(R.styleable.ProtractorView_ticksBetweenLabel, mTicksBetweenLabel);
 
-
         }
+
+        mAngle = (mAngle > MAX) ? MAX : ((mAngle < 0) ? 0 : mAngle);
+
+        mArcPaint = new Paint();
+        mArcPaint.setColor(arcColor);
+        mArcPaint.setAntiAlias(true);
+        mArcPaint.setStyle(Paint.Style.STROKE);
+        mArcPaint.setStrokeWidth(mArcWidth);
+
+        mProgressPaint = new Paint();
+        mProgressPaint.setColor(arcProgressColor);
+        mProgressPaint.setAntiAlias(true);
+        mProgressPaint.setStyle(Paint.Style.STROKE);
+        mProgressPaint.setStrokeWidth(mProgressWidth);
+
+        if (mRoundedEdges) {
+            mArcPaint.setStrokeCap(Paint.Cap.ROUND);
+            mProgressPaint.setStrokeCap(Paint.Cap.ROUND);
+        }
+
+        mTickPaint = new Paint();
+        mTickPaint.setColor(tickColor);
+        mTickPaint.setAntiAlias(true);
+        mTickPaint.setStyle(Paint.Style.STROKE);
+        mTickPaint.setStrokeWidth(mTickWidth);
+
+
+        mTickProgressPaint = new Paint();
+        mTickProgressPaint.setColor(tickProgressColor);
+        mTickProgressPaint.setAntiAlias(true);
+        mTickProgressPaint.setStyle(Paint.Style.STROKE);
+        mTickProgressPaint.setStrokeWidth(mTickProgressWidth);
+
+        mTickTextPaint = new Paint();
+        mTickTextPaint.setColor(textColor);
+        mTickTextPaint.setAntiAlias(true);
+        mTickTextPaint.setStyle(Paint.Style.FILL);
+        mTickTextPaint.setTextSize(mAngleTextSize);
+        mTickTextPaint.setTextAlign(Paint.Align.CENTER);
+
+        mTickTextColoredPaint = new Paint();
+        mTickTextColoredPaint.setColor(textProgressColor);
+        mTickTextColoredPaint.setAntiAlias(true);
+        mTickTextColoredPaint.setStyle(Paint.Style.FILL);
+        mTickTextColoredPaint.setTextSize(mAngleTextSize);
+        mTickTextColoredPaint.setTextAlign(Paint.Align.CENTER);
     }
 }
