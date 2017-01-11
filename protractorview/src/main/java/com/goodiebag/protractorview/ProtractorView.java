@@ -7,6 +7,7 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
+import android.support.annotation.ColorInt;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
@@ -28,7 +29,7 @@ public class ProtractorView extends View {
 
     //Paints required for drawing
     private Paint mArcPaint;
-    private Paint mProgressPaint;
+    private Paint mArcProgressPaint;
     private Paint mTickPaint;
     private Paint mTickProgressPaint;
     private Paint mTickTextPaint;
@@ -37,7 +38,7 @@ public class ProtractorView extends View {
     //Arc related dimens
     private int mArcRadius = 0;
     private int mArcWidth = 2;
-    private int mProgressWidth = 2;
+    private int mArcProgressWidth = 2;
     private boolean mRoundedEdges = true;
 
     //Thumb Drawable
@@ -58,7 +59,7 @@ public class ProtractorView extends View {
     private int mAngle = 0;
     private boolean mTouchInside = true;
     private boolean mEnabled = true;
-    private int mTicksBetweenLabel = 2;
+    private TicksBetweenLabel mTicksBetweenLabel = TicksBetweenLabel.TWO;
     private int mTickIntervals = 15;
     private double mTouchAngle = 0;
     private float mTouchIgnoreRadius;
@@ -76,6 +77,10 @@ public class ProtractorView extends View {
         void onStopTrackingTouch(ProtractorView protractorView);
     }
 
+    public enum TicksBetweenLabel{
+        ZERO, ONE, TWO, THREE
+    }
+
     public ProtractorView(Context context) {
         super(context);
         init(context, null, 0);
@@ -91,23 +96,6 @@ public class ProtractorView extends View {
         init(context, attrs, defStyleAttr);
     }
 
-
-    public int getmArcWidth() {
-        return mArcWidth;
-    }
-
-    public void setmArcWidth(int mArcWidth) {
-        this.mArcWidth = mArcWidth;
-    }
-
-    public int getmProgressWidth() {
-        return mProgressWidth;
-    }
-
-    public void setmProgressWidth(int mProgressWidth) {
-        this.mProgressWidth = mProgressWidth;
-    }
-
     private void init(Context context, AttributeSet attrs, int defStyle) {
 
         final Resources res = getResources();
@@ -119,15 +107,14 @@ public class ProtractorView extends View {
         int textProgressColor = res.getColor(R.color.default_blue_light);
         int tickColor = res.getColor(R.color.progress_gray);
         int tickProgressColor = res.getColor(R.color.default_blue_light);
-        int thumbHalfheight = 0;
+        int thumbHalfHeight = 0;
         int thumbHalfWidth = 0;
 
         mThumb = res.getDrawable(R.drawable.thumb_selector);
 
-
         // Convert all default dimens to pixels for current density
         mArcWidth = (int) (mArcWidth * DENSITY);
-        mProgressWidth = (int) (mProgressWidth * DENSITY);
+        mArcProgressWidth = (int) (mArcProgressWidth * DENSITY);
         mAngleTextSize = (int) (mAngleTextSize * DENSITY);
         mTickOffset = (int) (mTickOffset * DENSITY);
         mTickLength = (int) (mTickLength * DENSITY);
@@ -140,12 +127,12 @@ public class ProtractorView extends View {
             if (thumb != null) {
                 mThumb = thumb;
             }
-            thumbHalfheight = mThumb.getIntrinsicHeight() / 2;
+            thumbHalfHeight = mThumb.getIntrinsicHeight() / 2;
             thumbHalfWidth = mThumb.getIntrinsicWidth() / 2;
-            mThumb.setBounds(-thumbHalfWidth, -thumbHalfheight, thumbHalfWidth, thumbHalfheight);
+            mThumb.setBounds(-thumbHalfWidth, -thumbHalfHeight, thumbHalfWidth, thumbHalfHeight);
             //Dimensions
             mAngleTextSize = (int) array.getDimension(R.styleable.ProtractorView_angleTextSize, mAngleTextSize);
-            mProgressWidth = (int) array.getDimension(R.styleable.ProtractorView_progressWidth, mProgressWidth);
+            mArcProgressWidth = (int) array.getDimension(R.styleable.ProtractorView_progressWidth, mArcProgressWidth);
             mTickOffset = (int) array.getDimension(R.styleable.ProtractorView_tickOffset, mTickOffset);
             mTickLength = (int) array.getDimension(R.styleable.ProtractorView_tickLength, mTickLength);
             mArcWidth = (int) array.getDimension(R.styleable.ProtractorView_arcWidth, mArcWidth);
@@ -163,9 +150,8 @@ public class ProtractorView extends View {
             mRoundedEdges = array.getBoolean(R.styleable.ProtractorView_roundEdges, mRoundedEdges);
             mEnabled = array.getBoolean(R.styleable.ProtractorView_enabled, mEnabled);
             mTouchInside = array.getBoolean(R.styleable.ProtractorView_touchInside, mTouchInside);
-            mTicksBetweenLabel = array.getInt(R.styleable.ProtractorView_ticksBetweenLabel, mTicksBetweenLabel);
-
-
+            int ordinal = array.getInt(R.styleable.ProtractorView_ticksBetweenLabel, mTicksBetweenLabel.ordinal());
+            mTicksBetweenLabel = TicksBetweenLabel.values()[ordinal];
 
         }
 
@@ -177,15 +163,15 @@ public class ProtractorView extends View {
         mArcPaint.setStyle(Paint.Style.STROKE);
         mArcPaint.setStrokeWidth(mArcWidth);
 
-        mProgressPaint = new Paint();
-        mProgressPaint.setColor(arcProgressColor);
-        mProgressPaint.setAntiAlias(true);
-        mProgressPaint.setStyle(Paint.Style.STROKE);
-        mProgressPaint.setStrokeWidth(mProgressWidth);
+        mArcProgressPaint = new Paint();
+        mArcProgressPaint.setColor(arcProgressColor);
+        mArcProgressPaint.setAntiAlias(true);
+        mArcProgressPaint.setStyle(Paint.Style.STROKE);
+        mArcProgressPaint.setStrokeWidth(mArcProgressWidth);
 
         if (mRoundedEdges) {
             mArcPaint.setStrokeCap(Paint.Cap.ROUND);
-            mProgressPaint.setStrokeCap(Paint.Cap.ROUND);
+            mArcProgressPaint.setStrokeCap(Paint.Cap.ROUND);
         }
 
         mTickPaint = new Paint();
@@ -251,7 +237,7 @@ public class ProtractorView extends View {
         int thumbAngle = mAngle;
         mThumbXPos = (int) (mArcRadius * Math.cos(Math.toRadians(thumbAngle)));
         mThumbYPos = (int) (mArcRadius * Math.sin(Math.toRadians(thumbAngle)));
-        setTouchInSide(mTouchInside);
+        setTouchInside(mTouchInside);
         setMeasuredDimension(width, height + tickEndToArc);
     }
 
@@ -261,16 +247,18 @@ public class ProtractorView extends View {
         canvas.save();
         canvas.scale(1, -1, mArcRect.centerX(), mArcRect.centerY());
         canvas.drawArc(mArcRect, 0, MAX, false, mArcPaint);
-        canvas.drawArc(mArcRect, 0, mAngle, false, mProgressPaint);
+        canvas.drawArc(mArcRect, 0, mAngle, false, mArcProgressPaint);
 
         canvas.restore();
         double slope, startTickX, startTickY, endTickX, endTickY, midTickX, midTickY, thetaInRadians;
         double radiusOffset = mArcRadius + mTickOffset;
 
-        int count = mTicksBetweenLabel;
+        //TicksBetweenLabel
+
+        int count =  mTicksBetweenLabel.ordinal();
         for (int i = 360; i >= 180; i -= mTickIntervals) {
             canvas.save();
-            if (count == mTicksBetweenLabel) {
+            if (count == mTicksBetweenLabel.ordinal()) {
                 //for text
                 canvas.translate(mArcRect.centerX(), mArcRect.centerY());
                 thetaInRadians = Math.toRadians(i);
@@ -420,7 +408,16 @@ public class ProtractorView extends View {
         mThumbYPos = (int) (mArcRadius * Math.sin(Math.toRadians(thumbAngle)));
     }
 
-    public void setTouchInSide(boolean isEnabled) {
+
+    //*****************************************************
+    // Setters and Getters
+    //*****************************************************
+
+    public boolean getTouchInside(){
+        return mTouchInside;
+    }
+
+    public void setTouchInside(boolean isEnabled) {
         int thumbHalfheight = (int) mThumb.getIntrinsicHeight() / 2;
         int thumbHalfWidth = (int) mThumb.getIntrinsicWidth() / 2;
         mTouchInside = isEnabled;
@@ -435,8 +432,8 @@ public class ProtractorView extends View {
         mOnProtractorViewChangeListener = l;
     }
 
-    public void removeOnProtractorViewChangeListener(){
-        mOnProtractorViewChangeListener=null;
+    public OnProtractorViewChangeListener getOnProtractorViewChangeListener(){
+        return mOnProtractorViewChangeListener;
     }
 
     public int getAngle() {
@@ -445,11 +442,7 @@ public class ProtractorView extends View {
 
     public void setAngle(int angle) {
         this.mAngle = angle;
-        onProgressRefresh((int) mAngle, false);
-    }
-
-    public boolean getTouchInside(){
-        return mTouchInside;
+        onProgressRefresh(mAngle, false);
     }
 
     public boolean isEnabled() {
@@ -458,14 +451,15 @@ public class ProtractorView extends View {
 
     public void setEnabled(boolean enabled) {
         this.mEnabled = enabled;
+        invalidate();
     }
 
     public int getProgressColor() {
-        return mProgressPaint.getColor();
+        return mArcProgressPaint.getColor();
     }
 
-    public void setProgressColor(int color) {
-        mProgressPaint.setColor(color);
+    public void setProgressColor(@ColorInt int color) {
+        mArcProgressPaint.setColor(color);
         invalidate();
     }
 
@@ -473,106 +467,96 @@ public class ProtractorView extends View {
         return mArcPaint.getColor();
     }
 
-    public void setArcColor(int color) {
+    public void setArcColor(@ColorInt int color) {
         mArcPaint.setColor(color);
         invalidate();
     }
 
-    public int getProgressWidth() {
-        return mProgressWidth;
+    public int getArcProgressWidth() {
+        return mArcProgressWidth;
     }
 
-    public void setProgressWidth(int mProgressWidth) {
-        this.mProgressWidth = mProgressWidth;
-        mProgressPaint.setStrokeWidth(mProgressWidth);
+    public void setArcProgressWidth(int arcProgressWidth) {
+        this.mArcProgressWidth = arcProgressWidth;
+        mArcProgressPaint.setStrokeWidth(arcProgressWidth);
+        invalidate();
     }
 
     public int getArcWidth() {
         return mArcWidth;
     }
 
-    public void setArcWidth(int mArcWidth) {
-        this.mArcWidth = mArcWidth;
-        mArcPaint.setStrokeWidth(mArcWidth);
+    public void setArcWidth(int arcWidth) {
+        this.mArcWidth = arcWidth;
+        mArcPaint.setStrokeWidth(arcWidth);
+        invalidate();
     }
 
-    public boolean ismRoundedEdges() {
+    public boolean isRoundedEdges() {
         return mRoundedEdges;
     }
 
-    public void setmRoundedEdges(boolean mRoundedEdges) {
-        this.mRoundedEdges = mRoundedEdges;
+    public void setRoundedEdges(boolean roundedEdges) {
+        this.mRoundedEdges = roundedEdges;
+        if(roundedEdges) {
+            mArcPaint.setStrokeCap(Paint.Cap.ROUND);
+            mArcProgressPaint.setStrokeCap(Paint.Cap.ROUND);
+        } else {
+            mArcPaint.setStrokeCap(Paint.Cap.SQUARE);
+            mArcPaint.setStrokeCap(Paint.Cap.SQUARE);
+        }
+        invalidate();
     }
 
-    public Drawable getmThumb() {
+    public Drawable getThumb() {
         return mThumb;
     }
 
-    public void setmThumb(Drawable mThumb) {
-        this.mThumb = mThumb;
+    public void setThumb(Drawable thumb) {
+        this.mThumb = thumb;
+        invalidate();
     }
 
-    public int getmAngleTextSize() {
+    public int getAngleTextSize() {
         return mAngleTextSize;
     }
 
-    public void setmAngleTextSize(int mAngleTextSize) {
-        this.mAngleTextSize = mAngleTextSize;
+    public void setAngleTextSize(int angleTextSize) {
+        this.mAngleTextSize = angleTextSize;
+        invalidate();
     }
 
-    public int getmTickOffset() {
+    public int getTickOffset() {
         return mTickOffset;
     }
 
-    public void setmTickOffset(int mTickOffset) {
-        this.mTickOffset = mTickOffset;
+    public void setTickOffset(int tickOffset) {
+        this.mTickOffset = tickOffset;
     }
 
-    public int getmTickLength() {
+    public int getTickLength() {
         return mTickLength;
     }
 
-    public void setmTickLength(int mTickLength) {
-        this.mTickLength = mTickLength;
+    public void setTickLength(int tickLength) {
+        this.mTickLength = tickLength;
     }
 
-    public int getmAngle() {
-        return mAngle;
-    }
-
-    public void setmAngle(int mAngle) {
-        this.mAngle = mAngle;
-    }
-
-    public boolean ismTouchInside() {
-        return mTouchInside;
-    }
-
-    public void setmTouchInside(boolean mTouchInside) {
-        this.mTouchInside = mTouchInside;
-    }
-
-    public boolean ismEnabled() {
-        return mEnabled;
-    }
-
-    public void setmEnabled(boolean mEnabled) {
-        this.mEnabled = mEnabled;
-    }
-
-    public int getmTicksBetweenLabel() {
+    public TicksBetweenLabel getTicksBetweenLabel() {
         return mTicksBetweenLabel;
     }
 
-    public void setmTicksBetweenLabel(int mTicksBetweenLabel) {
+    public void setTicksBetweenLabel(TicksBetweenLabel ticksBetweenLabel) {
         this.mTicksBetweenLabel = mTicksBetweenLabel;
+        invalidate();
     }
 
-    public int getmTickIntervals() {
+    public int getTickIntervals() {
         return mTickIntervals;
     }
 
-    public void setmTickIntervals(int mTickIntervals) {
-        this.mTickIntervals = mTickIntervals;
+    public void setTickIntervals(int tickIntervals) {
+        this.mTickIntervals = tickIntervals;
+        invalidate();
     }
 }
