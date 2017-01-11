@@ -315,6 +315,9 @@ public class ProtractorView extends View {
 
             switch (event.getAction()) {
                 case MotionEvent.ACTION_DOWN:
+                    if(ignoreTouch(event.getX(),event.getY())){
+                        return false;
+                    }
                     onStartTrackingTouch();
                     updateOnTouch(event);
                     break;
@@ -356,7 +359,7 @@ public class ProtractorView extends View {
         float y = yPos - mTranslateY;
 
         float touchRadius = (float) Math.sqrt(((x * x) + (y * y)));
-        if (touchRadius < mTouchIgnoreRadius) {
+        if (touchRadius < mTouchIgnoreRadius || touchRadius > (mArcRadius+mTickLength+mTickOffset)) {
             ignore = true;
         }
         return ignore;
