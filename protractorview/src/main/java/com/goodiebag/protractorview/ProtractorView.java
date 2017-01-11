@@ -91,6 +91,23 @@ public class ProtractorView extends View {
         init(context, attrs, defStyleAttr);
     }
 
+
+    public int getmArcWidth() {
+        return mArcWidth;
+    }
+
+    public void setmArcWidth(int mArcWidth) {
+        this.mArcWidth = mArcWidth;
+    }
+
+    public int getmProgressWidth() {
+        return mProgressWidth;
+    }
+
+    public void setmProgressWidth(int mProgressWidth) {
+        this.mProgressWidth = mProgressWidth;
+    }
+
     private void init(Context context, AttributeSet attrs, int defStyle) {
 
         final Resources res = getResources();
@@ -147,6 +164,8 @@ public class ProtractorView extends View {
             mEnabled = array.getBoolean(R.styleable.ProtractorView_enabled, mEnabled);
             mTouchInside = array.getBoolean(R.styleable.ProtractorView_touchInside, mTouchInside);
             mTicksBetweenLabel = array.getInt(R.styleable.ProtractorView_ticksBetweenLabel, mTicksBetweenLabel);
+
+
 
         }
 
@@ -475,5 +494,85 @@ public class ProtractorView extends View {
     public void setArcWidth(int mArcWidth) {
         this.mArcWidth = mArcWidth;
         mArcPaint.setStrokeWidth(mArcWidth);
+    }
+
+    public boolean ismRoundedEdges() {
+        return mRoundedEdges;
+    }
+
+    public void setmRoundedEdges(boolean mRoundedEdges) {
+        this.mRoundedEdges = mRoundedEdges;
+    }
+
+    public Drawable getmThumb() {
+        return mThumb;
+    }
+
+    public void setmThumb(Drawable mThumb) {
+        this.mThumb = mThumb;
+    }
+
+    public int getmAngleTextSize() {
+        return mAngleTextSize;
+    }
+
+    public void setmAngleTextSize(int mAngleTextSize) {
+        this.mAngleTextSize = mAngleTextSize;
+    }
+
+    public int getmTickOffset() {
+        return mTickOffset;
+    }
+
+    public void setmTickOffset(int mTickOffset) {
+        this.mTickOffset = mTickOffset;
+    }
+
+    public int getmTickLength() {
+        return mTickLength;
+    }
+
+    public void setmTickLength(int mTickLength) {
+        this.mTickLength = mTickLength;
+    }
+
+    public int getmAngle() {
+        return mAngle;
+    }
+
+    public void setmAngle(int mAngle) {
+        this.mAngle = mAngle;
+    }
+
+    public boolean ismTouchInside() {
+        return mTouchInside;
+    }
+
+    public void setmTouchInside(boolean mTouchInside) {
+        this.mTouchInside = mTouchInside;
+    }
+
+    public boolean ismEnabled() {
+        return mEnabled;
+    }
+
+    public void setmEnabled(boolean mEnabled) {
+        this.mEnabled = mEnabled;
+    }
+
+    public int getmTicksBetweenLabel() {
+        return mTicksBetweenLabel;
+    }
+
+    public void setmTicksBetweenLabel(int mTicksBetweenLabel) {
+        this.mTicksBetweenLabel = mTicksBetweenLabel;
+    }
+
+    public int getmTickIntervals() {
+        return mTickIntervals;
+    }
+
+    public void setmTickIntervals(int mTickIntervals) {
+        this.mTickIntervals = mTickIntervals;
     }
 }
