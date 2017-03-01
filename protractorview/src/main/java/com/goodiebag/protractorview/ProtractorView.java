@@ -1,3 +1,23 @@
+/*
+MIT License
+Copyright (c) 2017 GoodieBag
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+ */
+
 package com.goodiebag.protractorview;
 
 import android.content.Context;
@@ -13,7 +33,14 @@ import android.view.MotionEvent;
 import android.view.View;
 
 /**
- * Created by Krishanu on 10/01/17.
+ * This class implements a widget for android which is a semi-circular seekbar drawn like a protractor with ticks.
+ * Tick angles can be defined, angle value can be drawn at a desired interval of angles.
+ * Ticks are highlighted as the seekbar passes through the respective tick's angle.
+ * Date : 10/01/17.
+ *
+ * @author Krishanu
+ * @author Pavan
+ * @author Koushik
  */
 
 public class ProtractorView extends View {
@@ -77,7 +104,7 @@ public class ProtractorView extends View {
         void onStopTrackingTouch(ProtractorView protractorView);
     }
 
-    public enum TicksBetweenLabel{
+    public enum TicksBetweenLabel {
         ZERO, ONE, TWO, THREE
     }
 
@@ -96,11 +123,21 @@ public class ProtractorView extends View {
         init(context, attrs, defStyleAttr);
     }
 
+    /**
+     * A method to initialise the attributes from the XML.
+     * If not specified in the xml the default values are taken.
+     *
+     * @param context
+     * @param attrs
+     * @param defStyle
+     */
     private void init(Context context, AttributeSet attrs, int defStyle) {
 
         final Resources res = getResources();
 
-        // Defaults, may need to link this into theme settings
+        /**
+         * Defaults, may need to link this into theme settings
+         */
         int arcColor = res.getColor(R.color.progress_gray);
         int arcProgressColor = res.getColor(R.color.default_blue_light);
         int textColor = res.getColor(R.color.progress_gray);
@@ -112,7 +149,9 @@ public class ProtractorView extends View {
 
         mThumb = res.getDrawable(R.drawable.thumb_selector);
 
-        // Convert all default dimens to pixels for current density
+        /**
+         * Convert all default dimens to pixels for current density
+         */
         mArcWidth = (int) (mArcWidth * DENSITY);
         mArcProgressWidth = (int) (mArcProgressWidth * DENSITY);
         mAngleTextSize = (int) (mAngleTextSize * DENSITY);
@@ -154,7 +193,9 @@ public class ProtractorView extends View {
             mTicksBetweenLabel = TicksBetweenLabel.values()[ordinal];
 
         }
-
+        /**
+         * Creating and configuring the paints as  required.
+         */
         mAngle = (mAngle > MAX) ? MAX : ((mAngle < 0) ? 0 : mAngle);
 
         mArcPaint = new Paint();
@@ -254,8 +295,13 @@ public class ProtractorView extends View {
         double radiusOffset = mArcRadius + mTickOffset;
 
         //TicksBetweenLabel
+        /**
+         * Mechanism to draw the tick and text.
+         * Tan(theta) gives the slope.
+         * Formula for a straight line is y = mx + c. y is calculated for varying values of x and the ticks are drawn.
+         */
 
-        int count =  mTicksBetweenLabel.ordinal();
+        int count = mTicksBetweenLabel.ordinal();
         for (int i = 360; i >= 180; i -= mTickIntervals) {
             canvas.save();
             if (count == mTicksBetweenLabel.ordinal()) {
@@ -315,7 +361,7 @@ public class ProtractorView extends View {
 
             switch (event.getAction()) {
                 case MotionEvent.ACTION_DOWN:
-                    if(ignoreTouch(event.getX(),event.getY())){
+                    if (ignoreTouch(event.getX(), event.getY())) {
                         return false;
                     }
                     onStartTrackingTouch();
@@ -359,7 +405,7 @@ public class ProtractorView extends View {
         float y = yPos - mTranslateY;
 
         float touchRadius = (float) Math.sqrt(((x * x) + (y * y)));
-        if (touchRadius < mTouchIgnoreRadius || touchRadius > (mArcRadius+mTickLength+mTickOffset)) {
+        if (touchRadius < mTouchIgnoreRadius || touchRadius > (mArcRadius + mTickLength + mTickOffset)) {
             ignore = true;
         }
         return ignore;
@@ -374,7 +420,6 @@ public class ProtractorView extends View {
         mTouchAngle = getTouchDegrees(event.getX(), event.getY());
         onProgressRefresh((int) mTouchAngle, true);
     }
-
 
 
     private double getTouchDegrees(float xPos, float yPos) {
@@ -416,7 +461,7 @@ public class ProtractorView extends View {
     // Setters and Getters
     //*****************************************************
 
-    public boolean getTouchInside(){
+    public boolean getTouchInside() {
         return mTouchInside;
     }
 
@@ -435,7 +480,7 @@ public class ProtractorView extends View {
         mOnProtractorViewChangeListener = l;
     }
 
-    public OnProtractorViewChangeListener getOnProtractorViewChangeListener(){
+    public OnProtractorViewChangeListener getOnProtractorViewChangeListener() {
         return mOnProtractorViewChangeListener;
     }
 
@@ -501,7 +546,7 @@ public class ProtractorView extends View {
 
     public void setRoundedEdges(boolean roundedEdges) {
         this.mRoundedEdges = roundedEdges;
-        if(roundedEdges) {
+        if (roundedEdges) {
             mArcPaint.setStrokeCap(Paint.Cap.ROUND);
             mArcProgressPaint.setStrokeCap(Paint.Cap.ROUND);
         } else {
