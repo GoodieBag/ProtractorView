@@ -73,11 +73,31 @@ ProtractorView protractorView = (ProtractorView) findViewById(R.id.protractorvie
 
 //use setters to style it. Every xml attribute mentioned above has a setter to support programmatical creation of the views
 protractorView.setTickIntervals(15);
-protractorView.setArcColor(getColor(R.color.colorAccent));       protractorView.setProgressColor(getColor(R.color.myColor));
+protractorView.setArcColor(getColor(R.color.colorAccent));
+protractorView.setProgressColor(getColor(R.color.myColor));
 .
 .
 .
 //so on
+ ```
+ There is an event listener which can be set up as follows : 
+ ```java
+ protractorView.setOnProtractorViewChangeListener(new ProtractorView.OnProtractorViewChangeListener() {
+            @Override
+            public void onProgressChanged(ProtractorView pv, int progress, boolean b) {
+            	//protractorView's getters can be accessed using pv instance.
+            }
+
+            @Override
+            public void onStartTrackingTouch(ProtractorView pv) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(ProtractorView pv) {
+
+            }
+        });
  ```
 ### Thanks to : 
 Shoutout to [SeekArc](https://github.com/neild001/SeekArc). <br />
