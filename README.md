@@ -7,8 +7,7 @@ ProtractorView library for android :pouting_cat:
 
 A semicircular seekbar view for selecting an angle from 0° to 180.
 
-![alt tag](https://github.com/GoodieBag/ProtractorView/blob/5b691ab3e4294a2a896620ad27104b03618105e1/gif/PVcolors.gif?raw=true)		
-![alt tag](https://github.com/GoodieBag/ProtractorView/blob/5b691ab3e4294a2a896620ad27104b03618105e1/gif/PVgreen.gif?raw=true)   
+![alt tag](https://github.com/GoodieBag/ProtractorView/blob/5b691ab3e4294a2a896620ad27104b03618105e1/gif/PVcolors.gif?raw=true)		![alt tag](https://github.com/GoodieBag/ProtractorView/blob/5b691ab3e4294a2a896620ad27104b03618105e1/gif/PVgreen.gif?raw=true)   
 
 ## Gradle Dependency
 
