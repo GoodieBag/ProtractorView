@@ -1,10 +1,14 @@
 # ProtractorView
 	
+[![Release](https://jitpack.io/v/GoodieBag/ProtractorView.svg)](https://jitpack.io/#GoodieBag/ProtractorView)
+[![API](https://img.shields.io/badge/API-15%2B-blue.svg?style=flat)](https://android-arsenal.com/api?level=15)
+
 ProtractorView library for android :pouting_cat:
 
-A semicircular seekbar view for selecting angle from 0° to 180°
+A semicircular seekbar view for selecting an angle from 0° to 180.
 
-![alt tag](https://github.com/GoodieBag/ProtractorView/blob/5b691ab3e4294a2a896620ad27104b03618105e1/gif/PVcolors.gif?raw=true)		![alt tag](https://github.com/GoodieBag/ProtractorView/blob/5b691ab3e4294a2a896620ad27104b03618105e1/gif/PVgreen.gif?raw=true)   
+![alt tag](https://github.com/GoodieBag/ProtractorView/blob/5b691ab3e4294a2a896620ad27104b03618105e1/gif/PVcolors.gif?raw=true)		
+![alt tag](https://github.com/GoodieBag/ProtractorView/blob/5b691ab3e4294a2a896620ad27104b03618105e1/gif/PVgreen.gif?raw=true)   
 
 ## Gradle Dependency
 
@@ -25,7 +29,61 @@ dependencies {
 ```
 Sync the gradle and that's it! :+1:
 
+## Features : 
+* A semi-circular seekbar widget for selecting an angle from 0° to 180°.
+* Complete customisation facilities for changing the colors of the text, tick, progress bar and thumb.
+* A special highlighting mechanism has been implemented. As the thumb passes through the angles (ticks / text), it can change the tick/text colors marking them as "traversed" to give the user a visual hint.  
+* The tick length and the interval between ticks and text can also be customised.
  
+ ## Usage : 
+ 
+ ### XML :
+ ```xml
+<com.goodiebag.protractorview.ProtractorView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:thumb="@drawable/your_thumb_drawable"
+        app:arcColor="#4a4a4a"
+        app:arcProgressColor="#FF0000"
+        app:tickColor="#4a4a4a"
+        app:tickProgressColor="#abe6"
+        app:textColor="#000"
+        app:textProgressColor="#FF0000"
+        app:angleTextSize="10sp"
+        app:arcWidth="4dp"
+        app:progressWidth="4dp"
+        app:tickOffset="18dp"
+        app:tickLength="10dp"
+        app:angle="15"
+        app:tickIntervals="15"
+        app:ticksBetweenLabel="three"
+        app:touchInside="true"
+        app:roundEdges="true" />
+ ```
+ 
+ ### Java :
+ To create the view programatically, you can do the following :
+ ```java
+ ProtractorView protractorView = new ProtractorView(this);
+ //This can then be added to its parent layout
+ layout.addView(protractorView);
+ ```
+ Or you can reference it from your XML : 
+ ```java
+ProtractorView protractorView = (ProtractorView) findViewById(R.id.protractorview);
+
+//use setters to style it. Every xml attribute mentioned above has a setter to support programmatical creation of the views
+protractorView.setTickIntervals(15);
+protractorView.setArcColor(getColor(R.color.colorAccent));       protractorView.setProgressColor(getColor(R.color.myColor));
+.
+.
+.
+//so on
+ ```
+### Thanks to : 
+Shoutout to [SeekArc](https://github.com/neild001/SeekArc). <br />
+Thanks to SeekArc by [neild001](https://github.com/neild001) we were able to understand the drawing mechanism of the circular seekbar, which then helped us draw the semi-circular one.
+
 
 ## LICENSE
 ```
